@@ -1,0 +1,15 @@
+{
+	"name": "adf-oncologydata",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "36c9e4e4-6d26-48c9-b4ca-d59c7fd17a39",
+		"tenantId": "f79933df-7034-4374-946f-6f6c72d2fb3c"
+	}
+}
