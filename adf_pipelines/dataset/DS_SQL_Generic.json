@@ -1,0 +1,97 @@
+{
+	"name": "DS_SQL_Generic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServer1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "path_ris"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "pathology_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "specimen_id",
+				"type": "varchar"
+			},
+			{
+				"name": "patient_id",
+				"type": "varchar"
+			},
+			{
+				"name": "patient_name",
+				"type": "varchar"
+			},
+			{
+				"name": "triggering_accession_number",
+				"type": "varchar"
+			},
+			{
+				"name": "collection_datetime",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "specimen_type",
+				"type": "varchar"
+			},
+			{
+				"name": "clinical_history",
+				"type": "varchar"
+			},
+			{
+				"name": "gross_description",
+				"type": "varchar"
+			},
+			{
+				"name": "final_diagnosis",
+				"type": "varchar"
+			},
+			{
+				"name": "category",
+				"type": "varchar"
+			},
+			{
+				"name": "pathologist",
+				"type": "varchar"
+			},
+			{
+				"name": "idh1_status",
+				"type": "varchar"
+			},
+			{
+				"name": "mgmt_promoter_status",
+				"type": "varchar"
+			},
+			{
+				"name": "extent_of_resection",
+				"type": "varchar"
+			},
+			{
+				"name": "karnofsky_performance_score",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "survival_days",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "vital_status",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "pathologydata"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

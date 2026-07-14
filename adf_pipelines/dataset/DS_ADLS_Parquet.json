@@ -1,0 +1,38 @@
+{
+	"name": "DS_ADLS_Parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"FolderName": {
+				"type": "string"
+			},
+			"Year": {
+				"type": "string"
+			},
+			"Month": {
+				"type": "string"
+			},
+			"Day": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@concat(\ndataset().FolderName,\n'/year=',\ndataset().Year,\n'/month=',\ndataset().Month,\n'/day=',\ndataset().Day\n)",
+					"type": "Expression"
+				},
+				"fileSystem": "bronze-oncologydata"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

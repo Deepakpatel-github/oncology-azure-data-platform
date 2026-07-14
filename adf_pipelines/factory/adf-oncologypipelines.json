@@ -1,0 +1,15 @@
+{
+	"name": "adf-oncologypipelines",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "20f98d53-ec41-4d25-abd5-13e85f302406",
+		"tenantId": "6e556450-7cfd-48e6-889a-49407eb2c15a"
+	}
+}

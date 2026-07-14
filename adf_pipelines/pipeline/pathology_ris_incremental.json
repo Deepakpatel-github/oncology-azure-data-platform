@@ -1,0 +1,157 @@
+{
+	"name": "pathology_ris_incremental",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup_watermark",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT\n    TableName,\n    WatermarkColumn,\n    LastWatermark,\n    SinkFolder\nFROM dbo.ETL_Watermark;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SqlServerETLwatermark",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach_Source",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup_watermark",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_watermark').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy_Incremental",
+							"description": "",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@concat(\n'SELECT * FROM dbo.',\nitem().TableName,\n' WHERE ',\nitem().WatermarkColumn,\n' > ',\nstring(item().LastWatermark)\n)",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_SQL_Generic",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ADLS_Parquet",
+									"type": "DatasetReference",
+									"parameters": {
+										"FolderName": {
+											"value": "@item().SinkFolder",
+											"type": "Expression"
+										},
+										"Year": "@formatDateTime(utcNow(),'yyyy')",
+										"Month": "@formatDateTime(utcNow(),'MM')",
+										"Day": "@formatDateTime(utcNow(),'dd')"
+									}
+								}
+							]
+						},
+						{
+							"name": "UpdateWatermark",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Copy_Incremental",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "SqlServer1",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "@concat(\n'UPDATE Oncology_DB.dbo.ETL_Watermark\nSET LastWatermark = (\n    SELECT MAX(', item().WatermarkColumn, ')\n    FROM Oncology_DB.dbo.', item().TableName, '\n)\nWHERE TableName = ''', item().TableName, ''''\n)",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-07-13T13:35:31Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
